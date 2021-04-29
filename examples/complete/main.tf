@@ -148,6 +148,11 @@ module "aws_cognito_user_pool_complete_example" {
         id_token      = "hours"
         refresh_token = "days"
       }
+
+      ui = {
+        css        = ".label-customizable {font-weight: 400;}"
+        image_file = "./images/logo.png"
+      }
     }
     test2 = {
       allowed_oauth_flows                  = []
@@ -205,6 +210,11 @@ module "aws_cognito_user_pool_complete_example" {
         "weather.read" = "Read weather forecasts"
       }
     }
+  }
+
+  ui = {
+    css        = ".label-customizable {font-weight: 400;}"
+    image_file = "./images/logo.png"
   }
 
 }

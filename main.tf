@@ -233,7 +233,8 @@ resource "aws_cognito_user_pool_client" "client" {
 
   # token_validity_units
   dynamic "token_validity_units" {
-    for_each = each.value.token_validity_units == null ? [] : [each.value.token_validity_units]
+    for_each = each.value.token_validity_units == null ? [] : [
+    each.value.token_validity_units]
     content {
       access_token  = token_validity_units.value.access_token
       id_token      = token_validity_units.value.id_token
@@ -247,6 +248,28 @@ resource "aws_cognito_user_pool_client" "client" {
 }
 
 /*
+  User Pool Client UI Customization
+*/
+resource "aws_cognito_user_pool_ui_customization" "all-clients" {
+  count = module.this.enabled && var.ui != null ? 1 : 0
+
+  css        = var.ui.css
+  image_file = var.ui.image_file != null ? filebase64(var.ui.image_file) : null
+
+  user_pool_id = aws_cognito_user_pool.default[0].id
+}
+
+resource "aws_cognito_user_pool_ui_customization" "client" {
+  for_each = module.this.enabled ? { for name, c in var.clients : name => c.ui if c.ui != null } : {}
+
+  client_id  = aws_cognito_user_pool_client.client[each.key].id
+  css        = each.value.css
+  image_file = each.value.image_file != null ? filebase64(each.value.image_file) : null
+
+  user_pool_id = aws_cognito_user_pool.default[0].id
+}
+
+/*
   User Pool Groups
 */
 resource "aws_cognito_user_group" "user_groups" {
@@ -257,6 +280,3 @@ resource "aws_cognito_user_group" "user_groups" {
   role_arn     = lookup(each.value, "role_arn")
   user_pool_id = aws_cognito_user_pool.default[0].id
 }
-
-
-

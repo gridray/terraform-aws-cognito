@@ -47,6 +47,10 @@ variable "clients" {
       id_token      = optional(string)
       refresh_token = optional(string)
     }))
+    ui = optional(object({
+      css        = optional(string)
+      image_file = optional(string)
+    }))
   }))
   default = {}
 }
@@ -195,6 +199,15 @@ variable "software_token_mfa_configuration_enabled" {
   description = "If true, and if mfa_configuration is also enabled, multi-factor authentication by software TOTP generator will be enabled"
   type        = bool
   default     = false
+}
+
+variable "ui" {
+  description = "If UI Customization is required for all clients then object should be set "
+  type = object({
+    css        = optional(string)
+    image_file = optional(string)
+  })
+  default = null
 }
 
 variable "username_case_sensitive" {
