@@ -36,19 +36,6 @@ module "aws_cognito_user_pool_complete_example" {
     reply_to_email_address = "no-reply@gridray.com"
   }
 
-  lambda_config = {
-    create_auth_challenge          = "arn:aws:lambda:us-east-1:123456789012:function:create_auth_challenge"
-    custom_message                 = "arn:aws:lambda:us-east-1:123456789012:function:custom_message"
-    define_auth_challenge          = "arn:aws:lambda:us-east-1:123456789012:function:define_auth_challenge"
-    post_authentication            = "arn:aws:lambda:us-east-1:123456789012:function:post_authentication"
-    post_confirmation              = "arn:aws:lambda:us-east-1:123456789012:function:post_confirmation"
-    pre_authentication             = "arn:aws:lambda:us-east-1:123456789012:function:pre_authentication"
-    pre_sign_up                    = "arn:aws:lambda:us-east-1:123456789012:function:pre_sign_up"
-    pre_token_generation           = "arn:aws:lambda:us-east-1:123456789012:function:pre_token_generation"
-    user_migration                 = "arn:aws:lambda:us-east-1:123456789012:function:user_migration"
-    verify_auth_challenge_response = "arn:aws:lambda:us-east-1:123456789012:function:verify_auth_challenge_response"
-  }
-
   password_policy_minimum_length                   = 10
   password_policy_require_lowercase                = false
   password_policy_require_numbers                  = true

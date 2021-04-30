@@ -1,3 +1,8 @@
+data "aws_lambda_function" "allow_idp" {
+  for_each = module.this.enabled && var.lambda_config != null ? {for key, value in var.lambda_config: key=> value if value!= null }: {}
+  function_name = each.value
+}
+
 locals {
 
   admin_create_user_config = var.admin_create_user_config == null ? null : {
@@ -70,16 +75,16 @@ resource "aws_cognito_user_pool" "default" {
     for_each = var.lambda_config == null ? [] : [
     var.lambda_config]
     content {
-      create_auth_challenge          = lookup(lambda_config.value, "create_auth_challenge")
-      custom_message                 = lookup(lambda_config.value, "custom_message")
-      define_auth_challenge          = lookup(lambda_config.value, "define_auth_challenge")
-      post_authentication            = lookup(lambda_config.value, "post_authentication")
-      post_confirmation              = lookup(lambda_config.value, "post_confirmation")
-      pre_authentication             = lookup(lambda_config.value, "pre_authentication")
-      pre_sign_up                    = lookup(lambda_config.value, "pre_sign_up")
-      pre_token_generation           = lookup(lambda_config.value, "pre_token_generation")
-      user_migration                 = lookup(lambda_config.value, "user_migration")
-      verify_auth_challenge_response = lookup(lambda_config.value, "verify_auth_challenge_response")
+      create_auth_challenge          = lookup(lambda_config.value, "create_auth_challenge") != null?data.aws_lambda_function.allow_idp["create_auth_challenge"].arn: null
+      custom_message                 = lookup(lambda_config.value, "custom_message") != null?data.aws_lambda_function.allow_idp["custom_message"].arn: null
+      define_auth_challenge          = lookup(lambda_config.value, "define_auth_challenge")!= null?data.aws_lambda_function.allow_idp["define_auth_challenge"].arn: null
+      post_authentication            = lookup(lambda_config.value, "post_authentication")!= null?data.aws_lambda_function.allow_idp["post_authentication"].arn: null
+      post_confirmation              = lookup(lambda_config.value, "post_confirmation")!= null?data.aws_lambda_function.allow_idp["post_confirmation"].arn: null
+      pre_authentication             = lookup(lambda_config.value, "pre_authentication")!= null?data.aws_lambda_function.allow_idp["pre_authentication"].arn: null
+      pre_sign_up                    = lookup(lambda_config.value, "pre_sign_up")!= null?data.aws_lambda_function.allow_idp["pre_sign_up"].arn: null
+      pre_token_generation           = lookup(lambda_config.value, "pre_token_generation")!= null?data.aws_lambda_function.allow_idp["pre_token_generation"].arn: null
+      user_migration                 = lookup(lambda_config.value, "user_migration")!= null?data.aws_lambda_function.allow_idp["user_migration"].arn: null
+      verify_auth_challenge_response = lookup(lambda_config.value, "verify_auth_challenge_response")!= null?data.aws_lambda_function.allow_idp["verify_auth_challenge_response"].arn: null
     }
   }
 
@@ -173,6 +178,20 @@ resource "aws_cognito_user_pool" "default" {
 
   tags = module.this.tags
 }
+
+/*
+  Lambda Permissions
+*/
+
+resource "aws_lambda_permission" "allow_idp" {
+  for_each = module.this.enabled && var.lambda_config != null ? {for key, value in var.lambda_config: key=> value if value!= null }: {}
+  statement_id  = format("AllowExecutionFromCognitoIdp-%s-%s", aws_cognito_user_pool.default[0].id, each.key)
+  action        = "lambda:InvokeFunction"
+  function_name = data.aws_lambda_function.allow_idp[each.key].function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.default[0].arn
+}
+
 
 
 /*
@@ -270,6 +289,10 @@ resource "aws_cognito_user_pool_ui_customization" "all-clients" {
   image_file = var.ui.image_file != null ? filebase64(var.ui.image_file) : null
 
   user_pool_id = aws_cognito_user_pool.default[0].id
+
+  depends_on = [
+    aws_cognito_user_pool_domain.domain
+  ]
 }
 
 resource "aws_cognito_user_pool_ui_customization" "client" {
@@ -280,6 +303,10 @@ resource "aws_cognito_user_pool_ui_customization" "client" {
   image_file = each.value.image_file != null ? filebase64(each.value.image_file) : null
 
   user_pool_id = aws_cognito_user_pool.default[0].id
+
+  depends_on = [
+    aws_cognito_user_pool_domain.domain
+  ]
 }
 
 /*
