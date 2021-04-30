@@ -87,6 +87,17 @@ variable "email_configuration" {
   default = null
 }
 
+variable "identity_providers" {
+  type = map(object({
+    provider_type = string
+    provider_details = map(any)
+    attribute_mapping = optional(map(string))
+    idp_identifiers = optional(list(string))
+  }))
+  description = "Identity provider connected to userpool"
+  default = {}
+}
+
 variable "lambda_config" {
   description = "A container for the AWS Lambda triggers associated with the user pool"
   type = object({

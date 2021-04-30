@@ -48,6 +48,14 @@ output "domain_app_version" {
 }
 
 #
+# Identity providers available with this pool
+#
+output "identity_providers" {
+  description = "The identity providers available with user pool"
+  value = module.this.enabled ? [for name, value in var.identity_providers: name]: null
+}
+
+#
 # aws_cognito_user_pool_client
 #
 output "client_ids" {

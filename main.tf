@@ -208,6 +208,18 @@ resource "aws_cognito_resource_server" "resource" {
   user_pool_id = aws_cognito_user_pool.default[0].id
 }
 
+resource "aws_cognito_identity_provider" "default" {
+  for_each = module.this.enabled? var.identity_providers: {}
+
+  user_pool_id  = aws_cognito_user_pool.default[0].id
+
+  provider_name = each.key
+  provider_type = each.value.provider_type
+  provider_details = each.value.provider_details
+  attribute_mapping = each.value.attribute_mapping
+  idp_identifiers = each.value.idp_identifiers
+}
+
 /*
   User Pool Client config
 */
@@ -243,6 +255,7 @@ resource "aws_cognito_user_pool_client" "client" {
   }
 
   depends_on = [
+    aws_cognito_identity_provider.default,
     aws_cognito_resource_server.resource
   ]
 }
