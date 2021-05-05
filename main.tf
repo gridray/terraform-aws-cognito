@@ -26,7 +26,7 @@ resource "aws_cognito_user_pool" "default" {
 
   alias_attributes           = var.alias_attributes
   auto_verified_attributes   = var.auto_verified_attributes
-  name                       = module.this.name
+  name                       = module.this.name != null? module.this.name: module.this.id
   mfa_configuration          = var.mfa_configuration
   sms_authentication_message = var.sms_authentication_message
 

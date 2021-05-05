@@ -110,7 +110,7 @@ module "aws_cognito_user_pool_complete_example" {
   }
 
   # user_pool_domain
-  domain = "mydomain-com"
+  domain = "gridray-test-com"
 
 
   # clients
@@ -119,8 +119,8 @@ module "aws_cognito_user_pool_complete_example" {
       allowed_oauth_flows                  = []
       allowed_oauth_flows_user_pool_client = false
       allowed_oauth_scopes                 = []
-      callback_urls                        = ["https://mydomain.com/callback"]
-      default_redirect_uri                 = "https://mydomain.com/callback"
+      callback_urls                        = ["https://gridray-test.com/callback"]
+      default_redirect_uri                 = "https://gridray-test.com/callback"
       explicit_auth_flows                  = []
       generate_secret                      = true
       logout_urls                          = []
